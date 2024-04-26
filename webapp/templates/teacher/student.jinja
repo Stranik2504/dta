@@ -1,0 +1,31 @@
+{% extends 'layout.jinja' %}
+{% block content %}
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="collapse navbar-collapse container">
+            <ol class="breadcrumb bg-light pt-2 pb-2 m-0">
+                <li>
+                    <a class="logo-container text-decoration-none" href="/teacher">
+                        <div class="logo">
+                            <img class="logo-img" src="{{ url_for('static', filename='logo.svg') }}"/>
+                        </div>
+                    </a>
+                </li>
+                <li class="breadcrumb-item active" aria-current="page">
+                    Преподавательская
+                </li>
+            </ol>
+            <a class="breadcrumb-item text-decoration-none" href="/teacher/logout">
+                Выйти
+            </a>
+        </div>
+    </nav>
+    <div class="container">
+        {% for group, variant, task in options %}
+        <div>
+            Group: {{group}}<br>
+            Variant: {{variant}}<br>
+            Task: {{task}}<br>
+        </div>
+        {% endfor %}
+    </div>
+{% endblock %}

@@ -9,8 +9,8 @@ from flask import make_response, redirect, render_template, request
 
 from webapp.forms import TeacherLoginForm
 from webapp.managers import AppConfigManager, ExportManager, StatusManager, StudentManager, TeacherManager
-from webapp.models import Group, Message, Status, Task, Teacher, Variant
-from webapp.repositories import AppDatabase, DbContextManager
+from webapp.models import Message, Teacher
+from webapp.repositories import AppDatabase
 from webapp.utils import get_exception_info, teacher_jwt_required
 
 
@@ -22,6 +22,14 @@ students = StudentManager(config, db.students, db.mailers)
 statuses = StatusManager(db.tasks, db.groups, db.variants, db.statuses, config, db.seeds, db.checks)
 exports = ExportManager(db.groups, db.messages, statuses, db.variants, db.tasks, db.students, students)
 teachers = TeacherManager(db.teachers)
+
+
+@blueprint.route("/teacher/student/<int:student>", methods=["GET"])
+@teacher_jwt_required(db.teachers)
+def teacher_student_profile(teacher: Teacher, student: int):
+    messages = db.messages.get_by_student(student)
+    options = [(message.group, message.variant, message.task) for message in messages]
+    return render_template("teacher/student.jinja", options=options)
 
 
 @blueprint.route("/teacher/submissions/group/<gid>/variant/<vid>/task/<tid>", methods=["GET"], defaults={'page': 0})
@@ -168,7 +176,7 @@ def exam_csv(teacher: Teacher, group_id: int):
 
 @blueprint.route("/teacher/messages", methods=["GET"])
 @teacher_jwt_required(db.teachers)
-def messages(teacher: Teacher):
+def get_messages(teacher: Teacher):
     separator = request.args.get('separator')
     count = request.args.get('count')
     value = exports.export_messages(count, separator)

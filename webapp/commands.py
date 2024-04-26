@@ -5,7 +5,7 @@ from typing import Any, Callable
 import webapp.worker as worker
 from alembic import command
 from alembic.config import Config
-from webapp.managers import AppConfigManager
+from webapp.managers import AppConfigManager, StudentManager, TeacherManager
 from webapp.repositories import AppDatabase
 from webapp.utils import load_config_files
 
@@ -62,7 +62,12 @@ class SeedCmd:
         db.groups.create_by_names(groups)
         db.tasks.create_by_ids(tasks)
         db.variants.create_by_ids(range(0, 39 + 1))
+        self.create_test_users(db, config)
         print(f'Done seeding db {config.connection_string} using core {config.core_path}!')
+
+    def create_test_users(self, db: AppDatabase, config: AppConfigManager):
+        TeacherManager(db.teachers).create("teacher", "12345678")
+        StudentManager(config, db.students, db.mailers).create("example@example.com", "12345678")
 
 
 class AnalyzeCmd:

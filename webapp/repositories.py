@@ -317,6 +317,13 @@ class MessageRepository:
                 .order_by(Message.time.desc()) \
                 .all()
 
+    def get_by_student(self, student: int) -> list[Message]:
+        with self.db.create_session() as session:
+            return session.query(Message) \
+                .filter_by(student=student) \
+                .order_by(Message.time.desc()) \
+                .all()
+
     def mark_as_processed(self, message: int):
         with self.db.create_session() as session:
             session.query(Message) \
